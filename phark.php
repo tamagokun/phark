@@ -22,7 +22,7 @@ if($project = Project::locate())
 else
 {
 	$env = new Environment();
-	array_unshift($includePath, $env->activePackages());
+	array_unshift($includePath, $env->activePackagesDir());
 }
 
 // override the include path
