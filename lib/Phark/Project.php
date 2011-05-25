@@ -52,7 +52,7 @@ class Project
 			else
 				$dir = dirname($dir);
 		} 
-		while(!$projectRoot && $dir);
+		while(!$projectRoot && $dir != '/');
 
 		if($projectRoot)
 			return new self($projectRoot);

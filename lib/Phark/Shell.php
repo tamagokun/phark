@@ -36,6 +36,22 @@ class Shell
 		return $files;
 	}
 
+	/**
+	 * Enumerates directories in a directory
+	 * @return array
+	 */
+	public function dirs($basedir)
+	{
+		$dirs = array();
+
+		foreach (new \DirectoryIterator($basedir) as $fileInfo) {
+			if(!$fileInfo->isDot() && $fileInfo->isDir()) 
+				$dirs []= (string) $fileInfo;
+		}
+
+		return $dirs; 
+	}
+
 	public function mkdir($dir, $perms=0755)
 	{
 		if(!is_dir($dir))
@@ -73,10 +89,8 @@ class Shell
 		if(!is_dir(dirname($dest))) 
 			$this->mkdir(dirname($dest));
 		
-		$source = realpath($source);
-
 		if(!@copy($source, $dest))
-			throw new ShellException("Unable to copy $source to $dir: ".$this->_lastError());
+			throw new ShellException("Unable to copy $source to $dest: ".$this->_lastError());
 
 		return $this;	
 	}
@@ -113,6 +127,17 @@ class Shell
 	{
 		call_user_func_array('printf', func_get_args());
 		return $this;
+	}
+
+	public function putContents($file, $string, $flags=0)
+	{
+		file_put_contents($file, $string, $flags);
+		return $this;
+	}
+
+	public function realpath($path)
+	{
+		return realpath($path);
 	}
 
 	private function _lastError()

@@ -12,10 +12,10 @@ class InstallCommand implements \Phark\Command
 	public function execute($args, $env)
 	{
 		$opts = new \Phark\Options($args);
-		$result = $opts->parse(array('f'), array('command','package'));
+		$result = $opts->parse(array('-f'), array('command','package'));
 
 		// if a directory is specified
-		if($realpath = realpath($result->params['package']))
+		if($realpath = $env->shell()->realpath($result->params['package']))
 		{
 			$env->shell()->printf(" * installing from %s\n", $realpath);
 

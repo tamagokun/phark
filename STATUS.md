@@ -14,6 +14,7 @@ What's working?
 * Local package installation. `phark install <directory>`.
 * Listing local packages and project packages `phark list`
 * Show working environment with `phark environment`
+* Basic bundling
 
 What needs doing?
 -----------------
@@ -26,11 +27,13 @@ What needs doing?
 
 What's left for the future
 --------------------------
+
+* Package signing, web of trust
 * Web app for pharkphp.org (signup, register cert, accept package)
 * Submitting phark files to pharkphp.org. `phark publish`
 * Searching remote specifications (proper search)
-* Package signing (needed for publishing files)
 * Support grouped dependencies (developent deps only, for instance)
 * GIT support in Pharkdeps
 * SVN support in Pharkdeps
-* Dependency locking. `Pharkdeps.lock
+* PEAR support in Pharkdeps
+* Dependency locking. `Pharkdeps.lock`
