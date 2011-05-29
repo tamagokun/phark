@@ -3,16 +3,15 @@
 namespace Phark;
 
 /**
- * A dependency links a package name, a requirement and a number of sources 
+ * A dependency links a package name and a requirement
  */
 class Dependency
 {
-	public $package, $requirement, $sources;
+	public $package, $requirement;
 
-	public function __construct($package, $requirement, $sources=null)
+	public function __construct($package, $requirement)
 	{
 		$this->package = $package;
-		$this->sources = $sources;
 		$this->requirement = Requirement::parse($requirement); 
 	}
 
@@ -28,4 +27,10 @@ class Dependency
 	{
 		return sprintf('%s %s', $this->package, $this->requirement);
 	}	
+
+	public static function parse($string)
+	{
+		list($package, $requirement) = explode(' ', $string, 2);
+		return new self($package, $requirement);	
+	}
 }

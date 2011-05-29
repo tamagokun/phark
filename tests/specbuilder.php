@@ -9,13 +9,15 @@ class SpecificationBuilderTest extends \Phark\Tests\TestCase
 	public function testBuilding()
 	{
 		$shell = new MockShell();	
+		$shell->setReturnValue('getcwd', '/blargh');
 		$shell->setReturnValue('glob', array(
+			'Pharkspec',
 			'lib/Test/A.php',
 			'lib/Test/B.php',
 			'lib/Test/Package/C.php',
 			));
 
-		$builder = new \Phark\SpecificationBuilder('/blargh',$shell);
+		$builder = new \Phark\SpecificationBuilder($shell);
 		$spec = $builder
 			->name('pheasant')
 			->authors('Lachlan Donald <lachlan@ljd.cc>')
@@ -39,7 +41,7 @@ class SpecificationBuilderTest extends \Phark\Tests\TestCase
 		$this->assertIsA($spec->phpVersion(), '\Phark\Requirement');
 		$this->assertEqual($spec->includePath(), array('lib'));
 
-		$this->assertEqual($spec->files(), array(
+		$this->assertEqual(iterator_to_array($spec->files()), array(
 			'Pharkspec',
 			'lib/Test/A.php',
 			'lib/Test/B.php',

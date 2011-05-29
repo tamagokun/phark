@@ -4,34 +4,16 @@ namespace Phark;
 
 class Environment
 {
-	public function installDir()
-	{
-		return '/usr/local/phark';
-	}
+	private $_config=array();
 
-	public function remoteSources()
+	public function __construct($config=null)
 	{
-		return array('http://pharkphp.org/');
-	}
-
-	public function executableDir()
-	{
-		return '/usr/local/bin';
-	}
-
-	public function packageDirs()
-	{
-		return array('/usr/local/phark/packages');
-	}
-
-	public function activePackagesDir()
-	{
-		return '/usr/local/phark/activated';
-	}
-
-	public function cacheDir()
-	{
-		return '/usr/local/phark/cache';
+		$this->_config = $config ?: array(
+			'install_dir' => '/usr/local/phark',
+			'package_dir' => '/usr/local/phark/packages',
+			'active_dir' => '/usr/local/phark/activated',
+			'cache_dir' => '/usr/local/phark/cache',
+		);
 	}
 
 	public function shell()
@@ -39,13 +21,18 @@ class Environment
 		return new Shell();
 	}
 
-	public function packages()
+	public function sources()
 	{
-		return new PackageDir(new Path($this->installDir()), $this);
+		return array( new Source\HttpSource('http://phark.s3.amazonaws.com/') );
 	}
 
 	public function project()
 	{
 		return Project::locate($this);
+	}
+
+	public function __get($key)
+	{
+		return $this->_config[$key];
 	}
 }

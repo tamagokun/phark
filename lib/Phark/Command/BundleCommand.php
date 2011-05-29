@@ -4,6 +4,8 @@ namespace Phark\Command;
 
 use \Phark\Path;
 use \Phark\Exception;
+use \Phark\Specification;
+use \Phark\Bundler;
 
 class BundleCommand implements \Phark\Command
 {
@@ -18,12 +20,10 @@ class BundleCommand implements \Phark\Command
 		$result = $opts->parse(array('-f'), array('command'));
 
 		$shell = $env->shell();
-		$package = new \Phark\Package($shell->getcwd());
+		$spec = Specification::load($env->shell()->getcwd());
+		$shell->printf(" * bundling %s %s\n", $spec->name(), $spec->version());
 
-		$shell->printf(" * bundling %s %s\n", 
-			$package->spec()->name(), $package->spec()->version());
-
-		$bundler = new \Phark\Bundler($package);
+		$bundler = new Bundler($spec, $env->shell()->getcwd());
 		$phar = $bundler->bundle($shell->getcwd(), isset($result->opts['-f']));
 
 		$shell->printf(" * wrote %d files into %s √\n", count($phar), $bundler->pharfile());

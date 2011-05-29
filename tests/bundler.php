@@ -6,7 +6,8 @@ class BundlerTest extends \Phark\Tests\TestCase
 {
 	public function testSelfBundling()
 	{
-		$bundler = new \Phark\Bundler(new \Phark\Package(BASEDIR));
+		$spec = \Phark\Specification::load(BASEDIR);
+		$bundler = new \Phark\Bundler($spec, BASEDIR);
 		$phar = $bundler->bundle('/tmp');
 
 		// check some files are in place

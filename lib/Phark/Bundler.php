@@ -9,14 +9,15 @@ class Bundler
 {
 	const FORMAT_VERSION=1;
 
-	private $_package, $_env;
+	private $_dir, $_spec, $_env;
 
 	/**
 	 * Constructor
 	 */
-	public function __construct($package, $env=null)
+	public function __construct(Specification $spec, $dir, $env=null)
 	{
-		$this->_package = $package;
+		$this->_spec = $spec;
+		$this->_dir = $dir;
 		$this->_env = $env ?: new Environment();
 	}
 
@@ -26,7 +27,7 @@ class Bundler
 	 */
 	public function pharfile()
 	{
-		return $this->_package->spec()->hash().'.phar';
+		return $this->_spec->hash().'.phar';
 	}
 
 	/**
@@ -50,8 +51,8 @@ class Bundler
 
 		$phar = new \Phar($filename, 0, $this->pharfile());
 
-		foreach($this->_package->spec()->files() as $file)
-			$phar->addFile(new Path($this->_package->directory(), $file), $file);
+		foreach($this->_spec->files() as $file)
+			$phar->addFile(new Path($this->_dir, $file), $file);
 
 		$phar->setMetadata(array(
 			'pharkversion'=>\Phark::VERSION,

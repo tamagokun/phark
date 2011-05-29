@@ -14,6 +14,7 @@ class InstallCommand implements \Phark\Command
 		$opts = new \Phark\Options($args);
 		$result = $opts->parse(array('-f'), array('command','package'));
 
+		
 		// if a directory is specified
 		if($realpath = $env->shell()->realpath($result->params['package']))
 		{

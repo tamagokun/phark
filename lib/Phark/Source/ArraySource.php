@@ -4,28 +4,25 @@ namespace Phark\Source;
 
 class ArraySource implements \Phark\Source
 {
-	private $_specs=array();
+	private $_packages=array();
 
-	public function find($name, \Phark\Requirement $requirement=null)
+	public function package($name, \Phark\Version $version)
 	{
-		if(!isset($this->_specs[$name]))
-			return false;
+		foreach($this->packages() as $package)
+			if($package->name() == $name && $package->version()->equal($version))
+				return $package;
 
-		$requirement = \Phark\Requirement::parse($requirement);
-		$candidates = array();
-
-		foreach(\Phark\Version::sort(array_keys($this->_specs[$name])) as $version)
-		{
-			if(!$requirement || $requirement->isSatisfiedBy($version))
-				return $this->_specs[$name][(string)$version];
-		}	
-
-		return false;
+		throw new \Phark\Exception("Failed to find $name $version");
 	}
 
-	public function add($spec)
+	public function packages()
 	{
-		$this->_specs[$spec->name()][(string)$spec->version()] = $spec;
+		return $this->_packages;
+	}	
+
+	public function add($package)
+	{
+		$this->_packages []= $package;
 		return $this;
 	}
 }

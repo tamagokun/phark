@@ -4,7 +4,7 @@ namespace Phark;
 
 class Project
 {
-	private $_dir, $_env;
+	private $_dir, $_env, $_spec;
 
 	public function __construct($dir, $env=null)
 	{
@@ -29,9 +29,23 @@ class Project
 		);
 	}
 
-	public function packages()
+	/**
+	 * Returns Dependency objects for the Project
+	 */
+	public function dependencies()
 	{
-		return new PackageDir(new Path($this->_dir, 'vendor'), $this->_env);	
+		$pharkspec = new Path($this->_dir, 'Pharkspec');
+		$pharkdeps = new Path($this->_dir, 'Pharkdeps');
+
+		if($this->_env->shell()->isfile($pharkspec))
+		{
+			$spec = SpecificationBuilder::fromFile($pharkspec)->build();
+			return $spec->dependencies();
+		}
+		else
+		{
+			throw new Exception("Didn't find a Pharkspec file");
+		}
 	}
 
 	/**

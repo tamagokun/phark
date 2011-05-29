@@ -2,16 +2,48 @@
 
 namespace Phark;
 
-class FileList
+/**
+ * A list of files globbed against the cwd.
+ */
+class FileList implements \IteratorAggregate
 {
-	private $_basedir, $_shell, $_files=array(), $_exclude=array();
+	private $_shell, $_files=array(), $_exclude=array();
 
-	public function __construct($basedir, $shell)
+	/**
+	 * Constructor
+	 */
+	public function __construct(array $patterns=array(), Shell $shell=null)
 	{
-		$this->_basedir = $basedir;
-		$this->_shell = $shell;
+		$this->_shell = $shell ?: new Shell();
+
+		foreach($patterns as $pattern)
+		{
+			if($pattern[0] == '!')
+				$this->exclude(substr($pattern,1));
+			else
+				$this->add($pattern);
+		}
 	}
 
+	/* (non-phpdoc)
+	 * See \IteratorAggregate
+	 */
+	public function getIterator()
+	{
+		return new \ArrayIterator($this->files());
+	}
+
+	/**
+	 * Returns the base directory
+	 */ 
+	public function directory()
+	{
+		return $this->_shell->getcwd();
+	}
+
+	/**
+ 	 * Builds an array of relative filepaths
+	 */
 	public function files()
 	{
 		$exclude = $this->_exclude;
@@ -27,12 +59,13 @@ class FileList
 	 * Add a glob pattern for inclusion to the file list
 	 * @ see \Phark\Shell::glob()
 	 */
-	public function glob($pattern)
+	public function add($pattern)
 	{
-		$this->_files += array_filter($this->_shell->glob($this->_basedir, $pattern), function($f) use($pattern) {
+		$files = array_filter($this->_shell->glob($this->directory(), $pattern), function($f) use($pattern) {
 			return FileList::match($f, $pattern);
 		});
 
+		$this->_files = array_merge($this->_files, $files);
 		return $this;
 	}
 

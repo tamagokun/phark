@@ -9,6 +9,7 @@ class FileListTest extends \Phark\Tests\TestCase
 	public function testFiles()
 	{
 		$shell = new MockShell();
+		$shell->expectAtLeastOnce('getcwd');
 		$shell->setReturnValue('glob', array(
 			'lib/Package/A.php',
 			'lib/Package/Blargh/B.php',
@@ -18,21 +19,14 @@ class FileListTest extends \Phark\Tests\TestCase
 			'README.md',
 			'LICENSE',
 			'CONTRIBUTORS'
-			));
+		));
 
-		$list = new \Phark\FileList('/fake/path', $shell);
-		$list
-			->glob('lib/**')
-			->glob('README.md')
-			->glob('bin/**')
-			->exclude('bin/ignore.php')
-			;
-
-		$this->assertEqual($list->files(), array(
+		$list = new \Phark\FileList(array('lib/**','README.md','bin/*','!bin/ignore.php'), $shell);
+		$this->assertEqual(iterator_to_array($list), array(
 			'lib/Package/A.php',
 			'lib/Package/Blargh/B.php',
 			'README.md',
 			'bin/llamas.php',
-			));
+		));
 	}
 }

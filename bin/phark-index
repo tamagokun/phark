@@ -1,0 +1,26 @@
+#!/usr/bin/env php
+<?php
+
+// show all errors
+error_reporting(E_ALL);
+
+require_once __DIR__.'/../lib/Phark/ClassLoader.php';
+
+$classloader = new \Phark\ClassLoader(array(__DIR__.'/../lib'));
+$classloader->register();
+
+$env = new \Phark\Environment();
+$json = array();
+
+foreach($env->packages() as $package)
+{
+	$spec = $package->spec();
+	$dependencies = array();
+
+	foreach($spec->dependencies() as $dep)
+		$dependencies []= (string) $dep;
+
+	$json[$spec->name()][(string)$spec->version()] = $dependencies;
+}
+
+echo \Phark\Json::format(json_encode($json));

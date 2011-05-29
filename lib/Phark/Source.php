@@ -4,9 +4,7 @@ namespace Phark;
 
 interface Source
 {
-	/**
-	 * Finds matching packages 
-	 * @return Specification
-	 */
-	public function find($name, Requirement $requirement=null);
+	public function package($name, Version $version);
+
+	public function packages();
 }

@@ -7,42 +7,45 @@ class ResolverTest extends \Phark\Tests\TestCase
 	public function setUp()
 	{
 		$this->source = new \Phark\Source\ArraySource();
+		$this->index = new \Phark\Source\SourceIndex(array($this->source));
 	}
 
-	private function _spec($name, $version, $deps=array())
+	private function _package($name, $version, $deps=array())
 	{
-		$builder = new \Phark\SpecificationBuilder('/blargh');
+		$deps = array_map(function($dep) { return \Phark\Dependency::parse($dep); }, $deps);
+
+		$builder = new \Phark\SpecificationBuilder();
 		$builder
 			->name($name)
 			->version($version)
 			;
 
-		foreach($deps as $pkg=>$req)
-			$builder->dependency($pkg, $req);
+		foreach($deps as $dep)
+			$builder->dependency($dep->package, (string) $dep->requirement);
 
-		return $builder->build();
+		return new \Phark\Package($builder->build(), '/dev/null', 'filesystem');
 	}
 
 	public function testResolvingSimpleDependencies()
 	{
-		$package = $this->_spec('package','1.0.0', array(
-			'packageA'=>'1.0.0',
-			'packageB'=>'>=2.0.1',	
+		$package = $this->_package('package','1.0.0', array(
+			'packageA 1.0.0',
+			'packageB >=2.0.1',	
 		));
 
 		$this->source
 			->add($package)
-			->add($this->_spec('packageA', '1.0.0'))
-			->add($this->_spec('packageA', '2.0.0'))
-			->add($this->_spec('packageB', '1.0.1'))
-			->add($this->_spec('packageB', '2.0.1', array('packageC'=>'>=3.0.0')))
-			->add($this->_spec('packageC', '3.0.0', array('packageA'=>'>=1.0.0')))
-			->add($this->_spec('packageC', '3.5.0beta1', array('packageA'=>'>=1.0.0')))
+			->add($this->_package('packageA', '1.0.0'))
+			->add($this->_package('packageA', '2.0.0'))
+			->add($this->_package('packageB', '1.0.1'))
+			->add($this->_package('packageB', '2.0.1', array('packageC >=3.0.0')))
+			->add($this->_package('packageC', '3.0.0', array('packageA >=1.0.0')))
+			->add($this->_package('packageC', '3.5.0beta1', array('packageA >=1.0.0')))
 			;
 
-		$resolver = new \Phark\DependencyResolver();
-		$resolver->source($this->source);
-		$solution = $resolver->resolve($package);
+		$resolver = new \Phark\DependencyResolver($this->index);
+		$resolver->package($package);
+		$solution = $resolver->resolve();
 
 		$this->assertEqual($solution, array(
 			'packageC@3.5.0beta1',
@@ -54,18 +57,18 @@ class ResolverTest extends \Phark\Tests\TestCase
 
 	public function testCircularDependencies()
 	{
-		$package = $this->_spec('packageA','1.0.0', array(
-			'packageB'=>'1.0.0',
+		$package = $this->_package('packageA','1.0.0', array(
+			'packageB 1.0.0',
 		));
 
 		$this->source
 			->add($package)
-			->add($this->_spec('packageB', '1.0.0', array('packageA'=>'1.0.0')))
+			->add($this->_package('packageB', '1.0.0', array('packageA 1.0.0')))
 			;
 
-		$resolver = new \Phark\DependencyResolver();
-		$resolver->source($this->source);
-		$solution = $resolver->resolve($package);
+		$resolver = new \Phark\DependencyResolver($this->index);
+		$resolver->package($package);
+		$solution = $resolver->resolve();
 
 		$this->assertEqual($solution, array(
 			'packageB@1.0.0',
@@ -75,22 +78,22 @@ class ResolverTest extends \Phark\Tests\TestCase
 
 	public function testDependencyClash()
 	{
-		$package = $this->_spec('packageA','1.0.0', array(
-			'packageB'=>'1.0.0',
-			'packageC'=>'2.0.1',
+		$package = $this->_package('packageA','1.0.0', array(
+			'packageB 1.0.0',
+			'packageC 2.0.1',
 		));
 
 		$this->source
 			->add($package)
-			->add($this->_spec('packageB', '1.0.0', array('packageA'=>'1.0.0')))
-			->add($this->_spec('packageB', '2.0.0', array('packageA'=>'1.0.0')))
-			->add($this->_spec('packageC', '2.0.1', array('packageB'=>'2.0.0')))
+			->add($this->_package('packageB', '1.0.0', array('packageA 1.0.0')))
+			->add($this->_package('packageB', '2.0.0', array('packageA 1.0.0')))
+			->add($this->_package('packageC', '2.0.1', array('packageB 2.0.0')))
 			;
 
-		$resolver = new \Phark\DependencyResolver();
-		$resolver->source($this->source);
+		$resolver = new \Phark\DependencyResolver($this->index);
+		$resolver->package($package);
 		
 		$this->expectException();
 		$solution = $resolver->resolve($package);
-	}		
+	}	
 }

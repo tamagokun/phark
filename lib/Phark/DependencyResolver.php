@@ -3,125 +3,124 @@
 namespace Phark;
 
 /**
- * Resolves dependencies using a simple graph
+ * Resolves dependencies using a simple graph. There are some gaping holes in 
+ * this implementation, eventually a more serious resolver will be required.
+ *
  * @see http://www.electricmonk.nl/log/2008/08/07/dependency-resolving-algorithm/
  * @see http://www.pkgcore.org/~ferringb/misc-pdfs/model.pdf
  */
 class DependencyResolver
 {
 	private $_requirements=array();
+	private $_resolve=array();
+	private $_index;
 	private $_tree;
-	private $_sources=array();
 
 	/**
-	 * Adds a specification to be installed
-	 * @chainable
+	 * Constructor
 	 */
-	public function specification(Specification $spec)
+	public function __construct(Source\SourceIndex $index)
 	{
-		$this->dependency($spec->name(), new Requirement((string)$spec->version()));
+		$this->_index = $index;
+	}
+
+	/**
+	 * Adds a package to be installed
+	 */
+	public function package(Package $package)
+	{
+		$this->dependency(new Dependency($package->name(), '='.$package->version()));
 		return $this;
 	}
 
-	private function _sourceFind($package)
+	/**
+	 * Adds a dependency to be installed 
+	 * @chainable
+	 */
+	public function dependency(Dependency $dependency)
 	{
-		$requirement = new Requirement($this->_requirements[$package]);
+		$this->_requirements[$dependency->package] []= $dependency->requirement;
+		$this->_resolve []= $this->_leaf($this->_index->find($dependency));
+		return $this;
+	}
 
-		foreach($this->_sources as $source)
-		{
-			if($spec = $source->find($package, $requirement))
-				return $spec;
+	/**
+	 * Adds a leaf to the internal tree of package=>dependencies
+	 */
+	private function _leaf($package)
+	{
+		$hash = $package->hash();
+
+		if(!isset($this->_tree[$hash]))
+		{	
+			$this->_tree[$hash] = array();
+
+			foreach($package->dependencies() as $dep)
+			{
+				$this->_requirements[$dep->package] []= $dep->requirement;
+				$this->_tree[$hash][]= $this->_leaf($this->_index->find($dep));
+			}
 		}
 
-		throw new Exception("Failed to find a spec that matches $package $requirement");
+		return $hash;
 	}
 
 	/**
-	 * Adds a dependency to the resolver, also a leaf to the internal tree
-	 * @chainable
-	 */
-	public function dependency($name, Requirement $requirement)
-	{
-		$this->_requirements[$name] []= (string) $requirement;
-		$spec = $this->_sourceFind($name);
-
-		// protect against circular dependencies
-		if(isset($this->_tree[$spec->hash()]))
-			return $this;
-
-		$this->_tree[$spec->hash()] = (object) array(
-			'name'=>$spec->hash(),
-			'depends'=>array(),
-		);
-
-		// recurse into dependencies
-		foreach($spec->dependencies() as $dep)
-		{
-			$this->dependency($dep->package, $dep->requirement);	
-			$depSpec = $this->_sourceFind($dep->package);
-
-			// add an edge
-			$this->_tree[$spec->hash()]->depends []= $this->_tree[$depSpec->hash()];
-		}
-
-		return $this;
-	}
-
-	/**
-	 * Adds a source to use to lookup specs
-	 * @chainable
-	 */
-	public function source(Source $source)
-	{
-		$this->_sources []= $source;
-		return $this;
-	}
-
-	/**
-	 * Given a particular spec, returns an array of specific versions
-	 * to install in order
+	 * Returns the a list of package hashes to install 
 	 * @return array
 	 */
-	public function resolve($spec)
+	public function resolve()
 	{
-		$this->specification($spec);
-
 		$traversed = array();
-		$this->_traverse($spec->hash(), $traversed);
+		$install = array();
 
-		return array_reverse($traversed);
-	}
+		// build a list of visited versions
+		foreach($this->_resolve as $hash)
+			$this->_walk($hash, $traversed);
 
-	// TODO: tail recursion would be preferable here
-	private function _traverse($name, &$traversed)
-	{
-		$traversed []= $name;
-
-		foreach($this->_tree[$name]->depends as $leaf)
+		// apply requirements
+		foreach($traversed as $hash)
 		{
-			if(!in_array($leaf->name, $traversed))
-				$this->_traverse($leaf->name, $traversed);
+			list($package,$version) = explode('@',$hash);
+			$version = new \Phark\Version($version);
+
+			if(isset($this->_requirements[$package]))
+			{
+				$requirement = new \Phark\Requirement($this->_requirements[$package]);
+
+				if(!$requirement->isSatisfiedBy($version))
+					continue;
+			}
+			
+			if(!isset($install[$package]) || $install[$package]->less($version))
+				$install[$package] = $version;
 		}
+
+		// check all requirements have been installed
+		foreach($this->_requirements as $name=>$requirements)
+			if(!isset($install[$name]))
+				throw new Exception("Failed to find package to satisfy $name");	
+
+		// return package hashes
+		$packages = array();
+		foreach($install as $name=>$version)
+			$packages []= $name.'@'.$version;
+
+		return array_reverse($packages);
 	}
 
 	/**
-	 * Dumps the internal tree and dependencies
+	 * Traverse a tree depth first, record all traversed nodes
+	 * @return void
 	 */
-	public function debug()
+	private function _walk($node, &$traversed)
 	{
-		print("Requirements:\n");
+		if(in_array($node, $traversed))
+			return;
 
-		foreach($this->_requirements as $package=>$req)
-		{
-			printf(" %s %s\n", $package, implode(', ', $req));
-		}
+		$traversed []= $node;
 
-		print("\nDependency Tree:\n");
-
-		foreach($this->_tree as $leaf)
-		{
-			printf(" %s [%s]\n", $leaf->name,
-			 	implode(', ', array_map(function($l) { return $l->name; }, $leaf->depends)));
-		}
-	}
+		foreach($this->_tree[$node] as $subnode)
+			$this->_walk($subnode, $traversed);
+	}	
 }

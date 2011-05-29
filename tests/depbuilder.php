@@ -6,9 +6,13 @@ require_once __DIR__.'/base.php';
 
 class TestSource implements \Phark\Source
 {
-	public function find($name, \Phark\Requirement $requirement=null)
+	public function package($name, \Phark\Version $version)
 	{
 		return new \Phark\Specification();
+	}
+
+	public function packages()
+	{
 	}
 }
 

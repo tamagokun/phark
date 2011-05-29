@@ -3,7 +3,8 @@
 namespace Phark;
 
 /**
- * A directory containing a specific phark package repository structure
+ * A directory structure containing phark packages and a list of active 
+ * packages
  */
 class PackageDir implements \IteratorAggregate
 {
@@ -13,6 +14,9 @@ class PackageDir implements \IteratorAggregate
 
 	private $_dir, $_shell, $_env;
 
+	/**
+	 * Constructor
+	 */
 	public function __construct($dir, $env)
 	{
 		$this->_dir = $dir;
@@ -32,6 +36,25 @@ class PackageDir implements \IteratorAggregate
 			;		
 
 		return $this;
+	}
+
+	/**
+	 * Finds matching packages 
+	 */
+	public function find($name, Requirement $requirement=null)
+	{
+		$packagesDir = new Path($this->_dir, self::PACKAGES_PATH);
+		$candidates = array();
+
+		// we just want the version numbers	
+		foreach(preg_grep("/$name@/",$this->_shell->dirs((string)$packagesDir)) as $dir)
+			$candidates []= array_pop(explode('@',$dir));
+
+		foreach(\Phark\Version::sort($candidates) as $version)
+		{
+			if(!$requirement || $requirement->isSatisfiedBy($version))
+				return $this->package($name, (string)$version)->spec();
+		}	
 	}
 
 	/**
@@ -98,14 +121,8 @@ class PackageDir implements \IteratorAggregate
 		if($this->_shell->isdir($targetDir))
 			throw new Exception("Package {$spec->name()} {$spec->version()} is already installed");
 
-		// copy the files from source to target
-		foreach($spec->files() as $file)
-		{
-			$this->_shell->copy(
-				(string) new Path($package->directory(), $file),
-				(string) new Path($targetDir, $file)
-			);
-		}
+		// copy the package files into our directory
+		$package->copy((string) $targetDir);
 
 		if($activate)
 			$this->activate(new Package($targetDir, $spec));

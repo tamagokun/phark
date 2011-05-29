@@ -52,6 +52,10 @@ class Shell
 		return $dirs; 
 	}
 
+	/**
+	 * Creates a directory and any missing parent directories
+	 * @chainable
+	 */
 	public function mkdir($dir, $perms=0755)
 	{
 		if(!is_dir($dir))
@@ -95,6 +99,10 @@ class Shell
 		return $this;	
 	}
 
+	/**
+	 * Creates a symbolic link from target to link
+	 * @chainable
+	 */
 	public function symlink($target, $link)
 	{
 		if(!@symlink($target, $link))
@@ -103,6 +111,10 @@ class Shell
 		return $this;
 	}
 
+	/**
+	 * Changes the permissions of a file
+	 * @chainable
+	 */
 	public function chmod($file, $mode)
 	{
 		if(!chmod($file, $mode))
@@ -111,6 +123,10 @@ class Shell
 		return $this;
 	}
 
+	/**
+	 * Deletes a file or symbolic link
+	 * @chainable
+	 */
 	public function unlink($file)
 	{
 		if(!unlink($file))
@@ -129,12 +145,18 @@ class Shell
 		return $this;
 	}
 
+	/**
+	 * Writes to a file
+	 */
 	public function putContents($file, $string, $flags=0)
 	{
 		file_put_contents($file, $string, $flags);
 		return $this;
 	}
 
+	/**
+	 * Returns the realpath to a file
+	 */
 	public function realpath($path)
 	{
 		return realpath($path);
