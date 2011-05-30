@@ -11,9 +11,8 @@ class TestSource implements \Phark\Source
 		return new \Phark\Specification();
 	}
 
-	public function packages()
-	{
-	}
+	public function packages() {}
+	public function getIterator() {}
 }
 
 class DependencyBuilderTest extends \Phark\Tests\TestCase
