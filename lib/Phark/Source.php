@@ -2,7 +2,7 @@
 
 namespace Phark;
 
-interface Source
+interface Source extends \IteratorAggregate
 {
 	public function package($name, Version $version);
 

@@ -25,4 +25,9 @@ class ArraySource implements \Phark\Source
 		$this->_packages []= $package;
 		return $this;
 	}
+
+	public function getIterator()
+	{
+		return new \ArrayIterator($this->packages());
+	}
 }

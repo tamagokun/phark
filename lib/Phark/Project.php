@@ -22,11 +22,15 @@ class Project
 		return $this->_dir;
 	}
 
-	public function includePaths()
+	public function vendorDir()
 	{
-		return array(
-			(string) new Path($this->_dir, 'vendor')
-		);
+		return (string) new Path($this->directory(), 'vendor');
+	}
+
+	public function packages()
+	{
+		$source = new Source\DirectorySource(new Path($this->_dir, 'vendor'));
+		return $source->packages();
 	}
 
 	/**
@@ -39,8 +43,7 @@ class Project
 
 		if($this->_env->shell()->isfile($pharkspec))
 		{
-			$spec = SpecificationBuilder::fromFile($pharkspec)->build();
-			return $spec->dependencies();
+			return Specification::load($pharkspec)->dependencies();
 		}
 		else
 		{
@@ -57,18 +60,14 @@ class Project
 		$env = $env ?: new Environment();
 		$shell = $env->shell();
 		$dir = $shell->getcwd();
-		$projectRoot = false;
 
 		do
 		{
 			if($shell->isfile("$dir/Pharkspec") || $shell->isfile("$dir/Pharkdeps"))
-				$projectRoot = $dir;
+				return new self($dir);
 			else
 				$dir = dirname($dir);
 		} 
-		while(!$projectRoot && $dir != '/');
-
-		if($projectRoot)
-			return new self($projectRoot);
+		while($dir != '/');
 	}
 }

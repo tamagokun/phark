@@ -25,8 +25,8 @@ class FileListTest extends \Phark\Tests\TestCase
 		$this->assertEqual(iterator_to_array($list), array(
 			'lib/Package/A.php',
 			'lib/Package/Blargh/B.php',
-			'README.md',
 			'bin/llamas.php',
+			'README.md',
 		));
 	}
 }

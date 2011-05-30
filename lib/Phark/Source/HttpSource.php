@@ -5,9 +5,12 @@ namespace Phark\Source;
 use \Phark\Version;
 use \Phark\Package;
 use \Phark\Dependency;
+use \Phark\Specification;
 
 class HttpSource implements \Phark\Source
 {
+	const TYPE='http';
+
 	private $_url, $_index;
 
 	public function __construct($url)
@@ -16,13 +19,18 @@ class HttpSource implements \Phark\Source
 	}
 
 	public function package($name, \Phark\Version $version)
-	{
+	{	
 		$index = $this->index();
 		$deps = array_map(function($d){ return Dependency::parse($d); },
 			$index[$name][(string)$version]); 
 
-		return new Package(new Specification(),
-			$this->url("/packages/%s@%s.phark", $name, $version));
+		$spec = new Specification(array(
+			'name'=>$name, 'version'=>$version, 'dependencies'=>$deps
+		));
+
+		return new Package($spec, $this->url("/packages/%s@%s.phark", $name, $version),
+			self::TYPE
+		);
 	}
 
 	public function packages()
@@ -51,6 +59,11 @@ class HttpSource implements \Phark\Source
 	protected function url($string)
 	{
 		return rtrim($this->_url,'/').call_user_func_array('sprintf',func_get_args());
+	}
+
+	public function getIterator()
+	{
+		return new \ArrayIterator($this->packages());
 	}
 }
 

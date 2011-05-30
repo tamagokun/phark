@@ -17,12 +17,12 @@ $includePath = explode(PATH_SEPARATOR, get_include_path());
 // either work in project mode or system-wide mode
 if($project = Project::locate())
 {
-	$includePath = array_merge($project->includePaths(), $includePath);
+	array_unshift($includePath, $project->vendorDir());
 }
 else
 {
 	$env = new Environment();
-	array_unshift($includePath, $env->activePackagesDir());
+	array_unshift($includePath, $env->{'active_dir'});
 }
 
 // override the include path

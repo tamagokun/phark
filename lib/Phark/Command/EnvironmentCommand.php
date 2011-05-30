@@ -16,12 +16,13 @@ class EnvironmentCommand implements \Phark\Command
 			->printf("Phark Environment\n")
 			->printf("  - PHARK VERSION: %s\n", \Phark::VERSION)
 			->printf("  - PHP VERSION: %s\n", phpversion())
-			->printf("  - INSTALLATION DIRECTORY: %s\n", $env->installDir())
+			->printf("  - INSTALLATION DIRECTORY: %s\n", $env->{'install_dir'})
 			->printf("  - PHP EXECUTABLE: %s\n", trim(`which php`))
-			->printf("  - EXECUTABLE DIRECTORY: %s\n", $env->executableDir())
-			->printf("  - PACKAGE DIRS: \n")
+			->printf("  - EXECUTABLE DIRECTORY: %s\n", $env->{'executable_dir'})
+			//->printf("  - PACKAGE DIRS: \n")
 			;
 
+		/*
 		foreach($env->packageDirs() as $path)
 			$shell->printf("    - $path\n");
 
@@ -29,6 +30,7 @@ class EnvironmentCommand implements \Phark\Command
 
 		foreach($env->remoteSources() as $source)
 			$shell->printf("    - $source\n");
+		 */
 
 		$shell->printf("  - INCLUDE PATHS: \n");
 

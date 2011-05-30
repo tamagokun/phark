@@ -11,8 +11,9 @@ class Environment
 		$this->_config = $config ?: array(
 			'install_dir' => '/usr/local/phark',
 			'package_dir' => '/usr/local/phark/packages',
-			'active_dir' => '/usr/local/phark/activated',
+			'active_dir' => '/usr/local/phark/active',
 			'cache_dir' => '/usr/local/phark/cache',
+			'executable_dir' => '/usr/local/bin',
 		);
 	}
 
@@ -29,6 +30,11 @@ class Environment
 	public function project()
 	{
 		return Project::locate($this);
+	}
+
+	public function packages()
+	{
+		return new Source\DirectorySource($this->{'package_dir'});
 	}
 
 	public function __get($key)
