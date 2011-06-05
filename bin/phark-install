@@ -9,14 +9,25 @@ require_once __DIR__.'/../lib/Phark/ClassLoader.php';
 $classloader = new \Phark\ClassLoader(array(__DIR__.'/../lib'));
 $classloader->register();
 
-// install phark into itself
+// create directories 
 $env = new \Phark\Environment();
-$env->packages()->initalize()->install(new \Phark\Package(__DIR__.'/../'));
+$env->shell()
+	->mkdir($env->{'package_dir'}, 0755)
+	->mkdir($env->{'active_dir'}, 0755)
+	->mkdir($env->{'cache_dir'}, 0777)
+	;
+
+// install the phark package from local dir
+$package = new \Phark\LocalPackage(__DIR__.'/../');
+$package
+	->install()
+	->activate()
+	;
 
 // set auto_prepend_file in php.ini
 $ini = \Phark\PhpIni::fromCurrent();
 $ini->replace('auto_prepend_file',
-	new \Phark\Path($env->installDir(), \Phark\PackageDir::ACTIVE_PATH, 'phark/phark.php')
+	new \Phark\Path($env->{'active_dir'}, 'phark/phark.php')
 );
 
 

@@ -8,7 +8,7 @@ namespace Phark;
  */
 class Package
 {
-	private $_name, $_version, $_deps, $_env, $_dir, $_spec, $_source;
+	protected $_name, $_version, $_deps, $_env, $_dir, $_spec, $_source;
 
 	/**
 	 * Constructor
@@ -88,6 +88,37 @@ class Package
 			$this->_dir = $this->_source->fetch($this->name(), $this->version());
 
 		return $this->_dir;
+	}
+
+	/**
+	 * Changes the directory of the package
+	 */
+	public function chdir($dir)
+	{
+		$this->_dir = $dir;
+		return $this;
+	}
+
+	/**
+	 * Installs the package
+	 */
+	public function install()
+	{
+		$path = new \Phark\Path($this->_env->{'package_dir'}, $this->hash());
+		$installer = new \Phark\PackageInstaller($this->_env);
+		$installer->install($this, $path);		
+		$this->chdir((string) $path);
+		return $this;
+	}
+
+	/**
+	 * Activates the package
+	 */
+	public function activate()
+	{
+		$installer = new \Phark\PackageInstaller($this->_env);
+		$installer->activate($this, new \Phark\Path($this->_env->{'active_dir'}, $this->name()));		
+		return $this;
 	}
 
 	/**

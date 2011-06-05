@@ -65,7 +65,9 @@ class PackageInstaller
 		{
 			foreach($package->spec()->executables() as $bin)
 			{
-				$this->_shell->symlink(
+				$this->_shell
+					->chmod((string) new Path($dir, $bin), 0777)
+					->symlink(
 						(string) new Path($dir, $bin),
 						(string) new Path($this->_env->{'executable_dir'}, basename($bin))
 					);

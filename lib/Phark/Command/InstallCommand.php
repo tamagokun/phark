@@ -13,40 +13,38 @@ class InstallCommand implements \Phark\Command
 	{
 		$opts = new \Phark\Options($args);
 		$result = $opts->parse(array('-f','-s:'), array('command','package'));
-
-		// load the spec from file/url
-		if(isset($result->opts['-s']))
-		{
-			$fetcher = new \Phark\SpecificationFetcher($env);
-			$spec = $fetcher->fetch($result->opts['-s'][0]);
-		}
+		$spec = null;
 
 		// if a directory is specified
 		if($realpath = $env->shell()->realpath($result->params['package']))
 		{
 			$env->shell()->printf(" * installing from %s\n", $realpath);
 
-			//$package = new \Phark\Package($realpath);
-			//$env->packages()->install($package);
+			if(isset($result->opts['-s']))
+			{
+				$specfile = $result->opts['-s'][0];
+				$fetcher = new \Phark\SpecificationFetcher($env);
+				$spec = $fetcher->fetch($specfile);
+				$env->shell()->printf(" * reading spec %s\n", $specfile);
+			}
 
-			//$env->shell()->printf(" * package %s installed √\n", $package->spec()->hash());
+			$package = new \Phark\LocalPackage($realpath, $spec);
+			$package->install();
+
+			// copy over the spec
+			if(isset($specfile))
+				$env->shell()->copy($specfile, new \Phark\Path($package->directory(), \Phark\Specification::FILENAME));
 		}
 		else
 		{
 			$env->shell()->printf(" * installing %s\n", $result->params['package']);
 
 			$index = new \Phark\Source\SourceIndex($env->sources());
-			$package = $index->find(new \Phark\Dependency($result->params['package']));
-
-			// install the package
-			$installer = new \Phark\PackageInstaller($env);
-			$installer->install($package, new \Phark\Path($env->{'package_dir'}, $package->hash()));
-
-			// lookup from the local package store, activate
-			$package = $env->packages()->package($package->name(), $package->version());
-			$installer->activate($package, new \Phark\Path($env->{'active_dir'}, $package->name()));
-
-			$env->shell()->printf(" * package %s installed √\n", $package->hash());
+			$package = $index->find(new \Phark\Dependency($result->params['package']));		
+			$package->install();
 		}
+
+		$package->activate();
+		$env->shell()->printf(" * package %s installed √\n", $package->hash());		
 	}
 }

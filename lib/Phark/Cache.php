@@ -30,7 +30,7 @@ class Cache
 				throw new Exception("Failed to open {$filename->archive} for writing");
 
 			$remote = $callback($url);
-			stream_copy_stream($remote, $fp);
+			stream_copy_to_stream($remote, $fp);
 
 			fclose($fp);
 			fclose($remote);
