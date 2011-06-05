@@ -9,7 +9,7 @@ class Dependency
 {
 	public $package, $requirement;
 
-	public function __construct($package, $requirement)
+	public function __construct($package, $requirement=null)
 	{
 		$this->package = $package;
 		$this->requirement = Requirement::parse($requirement); 

@@ -4,22 +4,15 @@ namespace Phark\DependencyBuilderTest;
 
 require_once __DIR__.'/base.php';
 
-class TestSource implements \Phark\Source
-{
-	public function package($name, \Phark\Version $version)
-	{
-		return new \Phark\Specification();
-	}
-
-	public function packages() {}
-	public function getIterator() {}
-}
+\Mock::generate('\Phark\Source','MockSource'); 
 
 class DependencyBuilderTest extends \Phark\Tests\TestCase
 {
   public function setUp()
 	{
-		$this->source = $source = new TestSource();
+		$this->source = $source = new \MockSource();
+		$this->source->setReturnReference('package', new \Phark\Specification());
+
 		$this->sourceFactory = new \Phark\SourceFactory();
 		$this->sourceFactory->register('http', function($url, $params) use($source) {
 			return $source;

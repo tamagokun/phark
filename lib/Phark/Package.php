@@ -8,16 +8,17 @@ namespace Phark;
  */
 class Package
 {
-	private $_spec, $_url, $_urlType, $_env;
+	private $_name, $_version, $_deps, $_env, $_dir, $_spec, $_source;
 
 	/**
 	 * Constructor
 	 */
-	public function __construct(Specification $spec, $url, $urlType, Environment $env=null)
+	public function __construct($name, Version $version, $deps, Source $source, Environment $env=null)
 	{
-		$this->_spec = $spec;
-		$this->_url = $url;
-		$this->_urlType = $urlType;
+		$this->_name = $name;
+		$this->_version = $version;
+		$this->_deps = $deps;
+		$this->_source = $source;
 		$this->_env = $env ?: new Environment();
 	}
 
@@ -27,7 +28,7 @@ class Package
 	 */
 	public function name()
 	{
-		return $this->_spec->name();
+		return $this->_name;
 	}
 
 	/**
@@ -36,7 +37,7 @@ class Package
 	 */
 	public function version()
 	{
-		return $this->_spec->version();
+		return $this->_version;
 	}
 
 	/**
@@ -45,7 +46,7 @@ class Package
 	 */
 	public function hash()
 	{
-		return $this->_spec->hash();
+		return sprintf('%s@%s',$this->name(), $this->version());
 	}
 
 	/**
@@ -54,7 +55,7 @@ class Package
 	 */
 	public function dependencies()
 	{
-		return $this->_spec->dependencies();
+		return $this->_deps;
 	}
 
 	/**
@@ -63,7 +64,30 @@ class Package
 	 */
 	public function spec()
 	{
+		if(!isset($this->_spec))
+			$this->_spec = Specification::load($this->directory(), $this->_env->shell());
+
 		return $this->_spec;
+	}
+
+	/**
+	 * Returns a FileList for the package directory
+	 */
+	public function files()
+	{
+		return $this->spec()->files()->chdir($this->directory());
+	}
+
+	/**
+	 * Gets a directory for the package, triggers a fetch 
+	 * @return string
+	 */
+	public function directory()
+	{
+		if(!isset($this->_dir))
+			$this->_dir = $this->_source->fetch($this->name(), $this->version());
+
+		return $this->_dir;
 	}
 
 	/**
@@ -79,23 +103,14 @@ class Package
 		return $packages;				
 	}
 
-	/**
-	 * Copies the package files to a particular directory
-	 */
-	public function copy($dir)
+	public static function fromSpecification(Specification $spec, Source $source, Environment $env=null)
 	{
-		if($this->_urlType != 'file')
-			throw new \BadMethodCallException("Only file urls are implemented at present");
+		return new self($spec->name(), $spec->version(), $spec->dependencies(), $source, $env);
+	}
 
-		$sourceDir = $this->_url;
-
-		// copy the files from source to target
-		foreach($this->_spec->files() as $file)
-		{
-			$this->_env->shell()->copy(
-				(string) new Path($sourceDir, $file),
-				(string) new Path($dir, $file)
-			);
-		}
+	public static function parseHash($hash)
+	{
+		$components = explode('@', $hash, 2);
+		return array($components[0], new Version($components[1]));
 	}
 }

@@ -29,8 +29,7 @@ class Project
 
 	public function packages()
 	{
-		$source = new Source\DirectorySource(new Path($this->_dir, 'vendor'));
-		return $source->packages();
+		return new Source\DirectorySource(new Path($this->_dir, 'vendor'), $this->_env);
 	}
 
 	/**

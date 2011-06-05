@@ -54,6 +54,9 @@ class Bundler
 		foreach($this->_spec->files() as $file)
 			$phar->addFile(new Path($this->_dir, $file), $file);
 
+		// bundle the provided spec file
+		$phar->addFile($this->_spec->path(), Specification::FILENAME);
+
 		$phar->setMetadata(array(
 			'pharkversion'=>\Phark::VERSION,
 			'bundleversion'=>Bundler::FORMAT_VERSION,

@@ -17,10 +17,19 @@ class BundleCommand implements \Phark\Command
 	public function execute($args, $env)
 	{
 		$opts = new \Phark\Options($args);
-		$result = $opts->parse(array('-f'), array('command'));
+		$result = $opts->parse(array('-f','-s:'), array('command'));
+
+		if(isset($result->opts['-s']))
+		{
+			$fetcher = new \Phark\SpecificationFetcher($env);
+			$spec = $fetcher->fetch($result->opts['-s'][0]);
+		}
+		else
+		{
+			$spec = Specification::load($env->shell()->getcwd());
+		}
 
 		$shell = $env->shell();
-		$spec = Specification::load($env->shell()->getcwd());
 		$shell->printf(" * bundling %s %s\n", $spec->name(), $spec->version());
 
 		$bundler = new Bundler($spec, $env->shell()->getcwd());

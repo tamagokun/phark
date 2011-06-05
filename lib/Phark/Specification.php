@@ -20,16 +20,20 @@ class Specification
 		$description,
 		$dependencies=array(),
 		$devDependencies=array(),
-		$files=array()
+		$files=array(),
+		$executables=array(),
+		$path
 		;
 
 	/**
 	 * Constructor
 	 */
-	public function __construct($properties=array())
+	public function __construct($properties=array(), $path=null)
 	{
 		foreach($properties as $prop=>$value)
 			$this->$prop = $value;
+
+		$this->path = $path;
 	}
 
 	public function __call($method, $params)
@@ -50,10 +54,17 @@ class Specification
 		$shell = $shell ?: new Shell();
 
 		if($shell->isdir($file))
-			$file = new Path($file, Specification::FILENAME);
+			$file = (string) new Path($file, Specification::FILENAME);
+
+		if(!$shell->isfile($file))
+			throw new Exception("Failed to find $file");
 
 		$spec = new SpecificationBuilder($shell);
 		require $file;
-		return $spec->build();
+
+		$result = $spec->build();
+		$result->path = $file;
+
+		return $result;
 	}
 }

@@ -13,17 +13,8 @@ class ResolverTest extends \Phark\Tests\TestCase
 	private function _package($name, $version, $deps=array())
 	{
 		$deps = array_map(function($dep) { return \Phark\Dependency::parse($dep); }, $deps);
-
-		$builder = new \Phark\SpecificationBuilder();
-		$builder
-			->name($name)
-			->version($version)
-			;
-
-		foreach($deps as $dep)
-			$builder->dependency($dep->package, (string) $dep->requirement);
-
-		return new \Phark\Package($builder->build(), '/dev/null', 'filesystem');
+		
+		return new \Phark\Package($name, new \Phark\Version($version), $deps, $this->source);
 	}
 
 	public function testResolvingSimpleDependencies()

@@ -24,7 +24,7 @@ class Environment
 
 	public function sources()
 	{
-		return array( new Source\HttpSource('http://phark.s3.amazonaws.com/') );
+		return array( new Source\HttpSource('http://phark.s3.amazonaws.com/', $this) );
 	}
 
 	public function project()
@@ -34,7 +34,12 @@ class Environment
 
 	public function packages()
 	{
-		return new Source\DirectorySource($this->{'package_dir'});
+		return new Source\DirectorySource($this->{'package_dir'}, $this);
+	}
+
+	public function cache()
+	{
+		return new Cache($this->{'cache_dir'}, $this);
 	}
 
 	public function __get($key)

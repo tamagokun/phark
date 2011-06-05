@@ -37,7 +37,7 @@ class SourceIndex
 		$packages = array();
 
 		foreach($sources as $source)
-			foreach($source->packages() as $package)
+			foreach($source as $package)
 				$packages[$package->name()][] = $package;
 
 		// sort packages

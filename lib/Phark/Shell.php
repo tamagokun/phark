@@ -106,7 +106,7 @@ class Shell
 	public function symlink($target, $link)
 	{
 		if(!@symlink($target, $link))
-			throw new ShellException("Unable to link $link to $target: ".$this->_lastError());
+			throw new ShellException("Unable to link $target to $link: ".$this->_lastError());
 
 		return $this;
 	}
@@ -133,7 +133,19 @@ class Shell
 			throw new ShellException("Unable to unlink $file: ".$this->_lastError());
 
 		return $this;
-	}	
+	}
+
+	/**
+	 * Deletes an empty directory
+	 * @chainable
+	 */
+	public function rmdir($dir)
+	{
+		if(!rmdir($dir))
+			throw new ShellException("Unable to rmdir $dir: ".$this->_lastError());
+
+		return $this;
+	}		
 
 	/**
 	 * Outputs a line to STDOUT

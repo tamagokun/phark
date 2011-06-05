@@ -3,14 +3,16 @@
 namespace Phark\Source;
 
 use \Phark\Specification;
+use \Phark\Package;
 
 class DirectorySource implements \Phark\Source
 {
-	private $_specs;
+	private $_specs, $_env;
 
-	public function __construct($directory, $shell=null)
+	public function __construct($directory, $env)
 	{
-		$this->_specs = new \Phark\FileList(array('*/Pharkspec'), $shell);
+		$this->_env = $env;
+		$this->_specs = new \Phark\FileList(array('*/Pharkspec'), $env->shell());
 		$this->_specs->chdir($directory);
 	}
 
@@ -29,12 +31,18 @@ class DirectorySource implements \Phark\Source
 
 		foreach($this->_specs->files() as $file)
 		{
-			$spec = Specification::load((string) new \Phark\Path($this->_specs->directory(), $file));
-			$packages []= new \Phark\Package($spec, dirname($file), 'file');
+			$spec = Specification::load((string) new \Phark\Path($this->_specs->directory(), $file), $this->_env->shell());
+			$packages []= Package::fromSpecification($spec, $this, $this->_env);
 		}
 
 		return $packages;
 	}	
+
+	public function fetch($name, \Phark\Version $version)
+	{
+		return (string) new \Phark\Path($this->_specs->directory(), sprintf("%s@%s",
+			$name, $version));
+	}
 
 	public function getIterator()
 	{

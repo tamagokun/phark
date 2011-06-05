@@ -64,6 +64,14 @@ class Requirement
 	}
 
 	/**
+	 * Creates a requirement for a particular version
+	 */
+	public static function version($version)
+	{
+		return self::parse('='.$version);
+	}
+
+	/**
 	 * Convert to a string
 	 */
 	public function __toString()
