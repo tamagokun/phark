@@ -13,7 +13,7 @@ Phark installs by default to `/usr/local/phark`. Underneath this is:
 * `packages`
   Site wide packages are stored under here, decompressed from .phar form. These are in the form
 	`package@1.0.0`. For more details on version numbers see `versions`.
-* `activated`
+* `active`
 	The latest activated packages are symbolically linked here. This is the path that is included
 	in the php `include_path`. See `runtime` for more details.
 * `cache` 

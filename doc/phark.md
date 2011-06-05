@@ -16,33 +16,28 @@ See `phark help` for a list of available commands.
 ## INTRODUCTION
 
 The simplest use-case is installing a package. To install a package
-system-wide, use `phark install mypackage -g`. For installing a package 
-to the project directory you are in use `phark install mypackage`. For 
-more details see `phark help install`.
+use `phark install mypackage`. This package is now installed and 
+available system-wide. 
+
+For installing dependencies locally for a project, you can created
+a `Pharkdep` file listing the dependencies and then run `phark deps`.
+This will fix the dependencies for the project to just the ones 
+you've listed to give you a re-producable environment.
 
 To list the packages installed, use `phark list` for the present
-project's packages and the globally available ones. See `phark help list`
+project's packages, or `phark list -g` for global packages. See `phark help list`
 for how this works.
-
-## PACKAGE CONSUMERS
-
-If you're writing code and you want to use phark packages in your project,
-you are a package consumer. To specify which dependencies your project
-requires, you need a Pharkdeps file. See `phark help pharkdeps`.
-
-When you checkout a project with a Pharksdep file, use the `phark deps`
-command to ensure they are all up-to-date. See `phark help deps`.
 
 ## PACKAGE DEVELOPERS
 
-To publish your package, you must have a project with a Pharkfile in it
-describing the package. See `phark help pharkfile` for more details about
+To publish your package, you must have a project with a Pharkspec in it
+describing the package. See `phark help pharkspec` for more details about
 this.
 
 Relevant commands are available in the following help topics:
 
 * init
-  Answer some questions, create a basic Pharkfile. See `phark help init`.
+  Answer some questions, create a basic Pharkspec. See `phark help init`.
 * publish
   Publish your current package to <http://pharkphp.org>. See `phark help publish`
 * yank

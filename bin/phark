@@ -20,7 +20,7 @@ $commandline
 	;
 
 // show help
-if(count($argv) == 1 || in_array('--help', $argv))
+if(count($argv) == 1 || in_array('--help', $argv) || ($argc == 2 && $argv[1] == 'help'))
 {
 	echo "usage: phark [--version] [--help] <command> [<args>]\n\n";
 	echo "The commands that are available are:\n";

@@ -14,6 +14,7 @@ class Environment
 			'active_dir' => '/usr/local/phark/active',
 			'cache_dir' => '/usr/local/phark/cache',
 			'executable_dir' => '/usr/local/bin',
+			'viewer' => 'man',
 		);
 	}
 
