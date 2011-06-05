@@ -50,6 +50,29 @@ class PackageInstaller
 	}
 
 	/**
+	 * Uninstalls and deactivates a package
+	 */
+	public function uninstall($package, $activeDir)
+	{
+		if($this->_shell->isfile($activeDir))
+			$this->deactivate($activeDir);
+
+		if($this->_shell->isdir($package->directory()))
+		{
+			foreach($this->_shell->glob($package->directory(), '**') as $file)
+				$this->_shell->unlink(Path::join($package->directory(), $file));
+
+			$this->_shell->rmdir($package->directory());
+		}
+		else if($this->_shell->isfile($package->directory()))
+		{
+			$this->_shell->unlink($package->directory());
+		}
+
+		return $this;
+	}
+
+	/**
 	 * Links a package directory to another location, optionally installs 
 	 * executables into execdir 
 	 */ 

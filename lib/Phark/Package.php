@@ -49,6 +49,11 @@ class Package
 		return sprintf('%s@%s',$this->name(), $this->version());
 	}
 
+	public function __toString()
+	{
+		return $this->hash();
+	}
+
 	/**
 	 * The package dependencies
 	 * @return array

@@ -17,6 +17,7 @@ $commandline
 	->register("list", new \Phark\Command\ListCommand())
 	->register("deps", new \Phark\Command\DependenciesCommand())
 	->register("bundle", new \Phark\Command\BundleCommand())
+	->register("remove", new \Phark\Command\RemoveCommand())
 	;
 
 // show help

@@ -2,6 +2,7 @@
 
 require_once __DIR__.'/base.php';
 
+
 class ResolverTest extends \Phark\Tests\TestCase
 {
 	public function setUp()
@@ -39,10 +40,10 @@ class ResolverTest extends \Phark\Tests\TestCase
 		$solution = $resolver->resolve();
 
 		$this->assertEqual($solution, array(
-			'packageC@3.5.0beta1',
-			'packageB@2.0.1',
-			'packageA@1.0.0',
-			'package@1.0.0',	
+			\Phark\Dependency::parse('packageC =3.5.0beta1'),
+			\Phark\Dependency::parse('packageB =2.0.1'),
+			\Phark\Dependency::parse('packageA =1.0.0'),
+			\Phark\Dependency::parse('package =1.0.0'),	
 		));
 	}
 
@@ -62,8 +63,8 @@ class ResolverTest extends \Phark\Tests\TestCase
 		$solution = $resolver->resolve();
 
 		$this->assertEqual($solution, array(
-			'packageB@1.0.0',
-			'packageA@1.0.0',
+			\Phark\Dependency::parse('packageB =1.0.0'),
+			\Phark\Dependency::parse('packageA =1.0.0'),
 		));
 	}	
 

@@ -19,9 +19,12 @@ class DependencyResolver
 	/**
 	 * Constructor
 	 */
-	public function __construct(Source\SourceIndex $index)
+	public function __construct(Source\SourceIndex $index, $dependencies=null)
 	{
 		$this->_index = $index;
+
+		if($dependencies)
+			foreach($dependencies as $dep) $this->dependency($dep);
 	}
 
 	/**
@@ -66,7 +69,7 @@ class DependencyResolver
 	}
 
 	/**
-	 * Returns the a list of package hashes to install 
+	 * Returns the a list of exact package version Dependency objects
 	 * @return array
 	 */
 	public function resolve()
@@ -101,12 +104,12 @@ class DependencyResolver
 			if(!isset($install[$name]))
 				throw new Exception("Failed to find package to satisfy $name");	
 
-		// return package hashes
-		$packages = array();
+		// return dependency objects
+		$dependencies = array();
 		foreach($install as $name=>$version)
-			$packages []= $name.'@'.$version;
+			$dependencies []= new Dependency($name, Requirement::version($version));
 
-		return array_reverse($packages);
+		return array_reverse($dependencies);
 	}
 
 	/**

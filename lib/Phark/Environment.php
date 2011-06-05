@@ -38,6 +38,12 @@ class Environment
 		return new Source\DirectorySource($this->{'package_dir'}, $this);
 	}
 
+	public function package($name, $version=null)
+	{
+		$index = new Source\SourceIndex(array($this->packages()));
+		return $index->find(new Dependency($name, $version ? Version::parse($version) : null));					
+	}
+
 	public function cache()
 	{
 		return new Cache($this->{'cache_dir'}, $this);

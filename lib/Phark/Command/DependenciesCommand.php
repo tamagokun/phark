@@ -26,21 +26,17 @@ class DependenciesCommand implements \Phark\Command
 
 		// create a source index
 		$index = new SourceIndex($env->sources());
-		$resolver = new DependencyResolver($index);
+		$resolver = new DependencyResolver($index, $project->dependencies());
 
 		$env->shell()->printf(" * checking dependencies for %s\n", $project->name());
 
-		foreach($project->dependencies() as $dep)
-			$resolver->dependency($dep);
-
-		foreach($resolver->resolve() as $hash)
+		foreach($resolver->resolve() as $dependency)
 		{
-			list($name, $version) = Package::parseHash($hash);
-			$env->shell()->printf("   * %s@%s ", $name, $version);
+			$env->shell()->printf("     %s ", $dependency);
 
 			try
 			{
-				$package = $installed->find(new Dependency($name), Requirement::version($version));
+				$package = $installed->find($dependency);
 				$env->shell()->printf("√\n");
 				continue;
 			}
@@ -49,11 +45,13 @@ class DependenciesCommand implements \Phark\Command
 				$env->shell()->printf("required\n");
 			}
 
-			$package = $index->find(new Dependency($name), Requirement::version($version));
+			$package = $index->find($dependency);
 			$installer = new \Phark\PackageInstaller($env);
-			$installer->install($package, new \Phark\Path($project->vendorDir(), $package->name()));			
+			$installer->install($package, Path::join($project->vendorDir(), $package->name()));			
 
-			$env->shell()->printf("     * installed √\n", $package->hash());
+			$env->shell()->printf("       installed √\n", $package->hash());
 		}
+
+		$env->shell()->printf(" * dependencies are up to date √\n");
 	}
 }

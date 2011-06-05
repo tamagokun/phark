@@ -27,4 +27,10 @@ class PathTest extends \Phark\Tests\TestCase
 		$path = new \Phark\Path("","myfile");
 		$this->assertEqual((string)$path, "myfile");
 	}
+
+	public function testRelativeWithDots()
+	{
+		$path = new \Phark\Path("/my/path/../","myfile");
+		$this->assertEqual((string)$path, "/my/path/../myfile");
+	}
 }

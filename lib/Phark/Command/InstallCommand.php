@@ -29,7 +29,6 @@ class InstallCommand implements \Phark\Command
 			}
 
 			$package = new \Phark\LocalPackage($realpath, $spec);
-			$package->install();
 
 			// copy over the spec
 			if(isset($specfile))
@@ -41,10 +40,19 @@ class InstallCommand implements \Phark\Command
 
 			$index = new \Phark\Source\SourceIndex($env->sources());
 			$package = $index->find(new \Phark\Dependency($result->params['package']));		
-			$package->install();
 		}
 
-		$package->activate();
+		$resolver = new \Phark\DependencyResolver($index, $package->dependencies());
+		$env->shell()->printf(" * checking dependencies for %s\n", $package->name());
+
+		foreach(array_slice($resolver->resolve(),0,-1) as $dependency)
+		{
+			$env->shell()->printf(" * resolving dependencies %s\n", $dependency);
+			$depPackage = $index->find($dependency);
+			$depPackage->install()->activate();
+		}
+
+		$package->install()->activate();
 		$env->shell()->printf(" * package %s installed √\n", $package->hash());		
 	}
 }
