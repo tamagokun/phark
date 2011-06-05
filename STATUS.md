@@ -12,18 +12,22 @@ What's working?
 * Parsing of Pharkspec files
 * Basic dependency resolution
 * Local package installation. `phark install <directory>`.
-* Listing local packages and project packages `phark list`
+* Remote package installation. `phark install <packagename>`.
+* Listing global packages and project packages `phark list`
+* Removing global packages with `phark remove`
 * Show working environment with `phark environment`
+* Installing of package dependencies `phark deps`, only with Pharkspec
 * Basic bundling
+* Basic documentation. `phark help` and `phark help <topic>`
 
 What needs doing?
 -----------------
 
-* More documentation, `phark help` should be wired to man files
-* Fetching packages via HTTP `phark fetch`
-* Fetching tarball of latest spec files via HTTP
+* Fetching only with `phark fetch <package>`
+* Better console output with pretty ANSI goodness
 * Parsing Pharkdeps files, installing project deps. `phark deps`
-* Searching local specifications
+* Checking PHP version
+* Lots more documentation
 
 What's left for the future
 --------------------------
@@ -31,9 +35,11 @@ What's left for the future
 * Package signing, web of trust
 * Web app for pharkphp.org (signup, register cert, accept package)
 * Submitting phark files to pharkphp.org. `phark publish`
-* Searching remote specifications (proper search)
+* Searching remote specifications
 * Support grouped dependencies (developent deps only, for instance)
 * GIT support in Pharkdeps
 * SVN support in Pharkdeps
 * PEAR support in Pharkdeps
+* PECL support for building extensions
 * Dependency locking. `Pharkdeps.lock`
+* Windows support
