@@ -67,5 +67,10 @@ class HttpSource implements \Phark\Source
 	{
 		return new \ArrayIterator($this->packages());
 	}
+
+	public function __toString()
+	{
+		return (string) $this->_url;
+	}
 }
 

@@ -12,8 +12,8 @@ $classloader->register();
 // create directories 
 $env = new \Phark\Environment();
 $env->shell()
-	->mkdir($env->{'package_dir'}, 0755)
-	->mkdir($env->{'active_dir'}, 0755)
+	->mkdir($env->{'package_dir'}, 0777)
+	->mkdir($env->{'active_dir'}, 0777)
 	->mkdir($env->{'cache_dir'}, 0777)
 	;
 

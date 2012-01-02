@@ -88,6 +88,9 @@ class PackageInstaller
 		{
 			foreach($package->spec()->executables() as $bin)
 			{
+				if(!$this->_shell->isfile(Path::join($dir, $bin)))
+					throw new Exception("Couldn't find executable $bin"); 
+
 				$this->_shell
 					->chmod((string) new Path($dir, $bin), 0777)
 					->symlink(

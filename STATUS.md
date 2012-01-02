@@ -24,6 +24,7 @@ What needs doing?
 -----------------
 
 * Fetching only with `phark fetch <package>`
+* Installing packages as links to local directories with `phark link <directory>`
 * Better console output with pretty ANSI goodness
 * Parsing Pharkdeps files, installing project deps. `phark deps`
 * Checking PHP version

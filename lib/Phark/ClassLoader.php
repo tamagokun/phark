@@ -31,7 +31,7 @@ class ClassLoader
 			}
 
 			if(!class_exists($className) && !interface_exists($className))
-				return false; 
+				return false;
 		}
 	}
 

@@ -18,7 +18,7 @@ class SourceIndex
 			$this->_packages = $this->_index($this->_sources);
 
 		if(!isset($this->_packages[$dependency->package]))
-			throw new \Phark\Exception("No packages for $dependency");
+			throw new \Phark\Exception("No packages found for $dependency");
 
 		$requirement = $dependency->requirement;
 		$candidates = array();

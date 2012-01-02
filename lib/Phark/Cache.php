@@ -26,6 +26,10 @@ class Cache
 		// how about the archive?
 		if(!$shell->isfile($filename->archive))
 		{
+			if(!is_writable(dirname($filename->archive)))
+				throw new Exception("Unable to fetch to ".dirname($filename->archive).", no write permissions");
+			
+
 			if(!$fp = fopen($filename->archive, 'w+'))
 				throw new Exception("Failed to open {$filename->archive} for writing");
 
@@ -40,7 +44,7 @@ class Cache
 		if($shell->isfile($filename->archive))
 		{
 			if($filename->type != 'phar')
-				throw new Exception("Only phar archives are supporter at present");
+				throw new Exception("Only phar archives are supported at present");
 
 			$phar = new \Phar($filename->archive);
 			$phar->extractTo($filename->dir);

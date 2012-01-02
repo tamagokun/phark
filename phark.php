@@ -27,4 +27,3 @@ else
 
 // override the include path
 set_include_path(implode(PATH_SEPARATOR, $includePath));
-	

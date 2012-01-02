@@ -20,6 +20,8 @@ class InstallCommand implements \Phark\Command
 		{
 			$env->shell()->printf(" * installing from %s\n", $realpath);
 
+			$index = new \Phark\Source\SourceIndex($env->sources());
+
 			if(isset($result->opts['-s']))
 			{
 				$specfile = $result->opts['-s'][0];
@@ -37,8 +39,6 @@ class InstallCommand implements \Phark\Command
 		else
 		{
 			$env->shell()->printf(" * installing %s\n", $result->params['package']);
-
-			$index = new \Phark\Source\SourceIndex($env->sources());
 			$package = $index->find(new \Phark\Dependency($result->params['package']));		
 		}
 
@@ -52,7 +52,9 @@ class InstallCommand implements \Phark\Command
 			$depPackage->install()->activate();
 		}
 
+		$env->shell()->printf(" * activating...\n");
 		$package->install()->activate();
+
 		$env->shell()->printf(" * package %s installed √\n", $package->hash());		
 	}
 }

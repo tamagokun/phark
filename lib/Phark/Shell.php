@@ -117,7 +117,7 @@ class Shell
 	 */
 	public function chmod($file, $mode)
 	{
-		if(!chmod($file, $mode))
+		if(!@chmod($file, $mode))
 			throw new ShellException("Unable to chmod $file to $mode: ".$this->_lastError());
 
 		return $this;
@@ -129,7 +129,7 @@ class Shell
 	 */
 	public function unlink($file)
 	{
-		if(!unlink($file))
+		if(!@unlink($file))
 			throw new ShellException("Unable to unlink $file: ".$this->_lastError());
 
 		return $this;
@@ -141,7 +141,7 @@ class Shell
 	 */
 	public function rmdir($dir)
 	{
-		if(!rmdir($dir))
+		if(!@rmdir($dir))
 			throw new ShellException("Unable to rmdir $dir: ".$this->_lastError());
 
 		return $this;

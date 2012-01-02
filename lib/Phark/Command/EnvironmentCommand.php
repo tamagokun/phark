@@ -22,20 +22,15 @@ class EnvironmentCommand implements \Phark\Command
 			//->printf("  - PACKAGE DIRS: \n")
 			;
 
-		/*
-		foreach($env->packageDirs() as $path)
-			$shell->printf("    - $path\n");
-
 		$shell->printf("  - SOURCES: \n");
 
-		foreach($env->remoteSources() as $source)
+		foreach($env->sources() as $source)
 			$shell->printf("    - $source\n");
-		 */
 
 		$shell->printf("  - INCLUDE PATHS: \n");
 
 		foreach(explode(PATH_SEPARATOR,get_include_path()) as $path)
-			if($path != '.') 
+			if(trim($path, '.'))
 				$shell->printf("    - $path\n");
 
 		// optionally show project details
