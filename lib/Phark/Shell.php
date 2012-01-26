@@ -23,7 +23,7 @@ class Shell
 	{
 		$files = array();
 		$iterator = new \RecursiveIteratorIterator(
-			new \RecursiveDirectoryIterator($basedir, \RecursiveDirectoryIterator::FOLLOW_SYMLINKS));
+			new \RecursiveDirectoryIterator($basedir, \RecursiveDirectoryIterator::FOLLOW_SYMLINKS | \RecursiveDirectoryIterator::SKIP_DOTS));
 
 		foreach ($iterator as $file)
 		{
