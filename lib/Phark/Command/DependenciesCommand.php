@@ -27,9 +27,9 @@ class DependenciesCommand implements \Phark\Command
 		// create a source index
 		$index = new SourceIndex($env->sources());
 		$resolver = new DependencyResolver($index, $project->dependencies());
-
+		
 		$env->shell()->printf(" * checking dependencies for %s\n", $project->name());
-
+		
 		foreach($resolver->resolve() as $dependency)
 		{
 			$env->shell()->printf("     %s ", $dependency);

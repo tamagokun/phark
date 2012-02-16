@@ -39,15 +39,20 @@ class Project
 	{
 		$pharkspec = new Path($this->_dir, 'Pharkspec');
 		$pharkdeps = new Path($this->_dir, 'Pharkdeps');
-
+		$found = false;
+		
 		if($this->_env->shell()->isfile($pharkspec))
 		{
-			return Specification::load($pharkspec)->dependencies();
+			$found = true;
+			if($deps = Specification::load($pharkspec)->dependencies() && count($deps) > 0)
+				return $deps;
 		}
-		else
+		if($this->_env->shell()->isfile($pharkdeps))
 		{
-			throw new Exception("Didn't find a Pharkspec file");
+			$found = true;
+			return Dependency::load($pharkdeps);
 		}
+		if(!$found) throw new Exception("Didn't find a Pharkspec file");
 	}
 
 	/**

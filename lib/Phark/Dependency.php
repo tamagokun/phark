@@ -7,12 +7,33 @@ namespace Phark;
  */
 class Dependency
 {
-	public $package, $requirement;
+	const FILENAME='Pharkdeps';
+	
+	public $package, $requirement, $group, $location;
 
-	public function __construct($package, $requirement=null)
+	public function __construct($package)
 	{
-		$this->package = $package;
-		$this->requirement = Requirement::parse($requirement); 
+		$args = func_get_args();
+		$this->package = array_shift($args);
+		$this->configure($args);
+	}
+	
+	public function configure($options)
+	{
+		foreach($options as $option)
+		{
+			if(is_string($option))
+				$this->requirement = Requirement::parse($option);
+			if(is_array($option))
+			{
+				foreach($option as $key=>$value)
+				{
+					if($key == "group") $this->group = $value;
+					
+				}	
+			}
+		}
+		
 	}
 
 	public function isSatisfiedBy($package, $version)
@@ -32,5 +53,26 @@ class Dependency
 	{
 		list($package, $requirement) = explode(' ', $string, 2);
 		return new self($package, $requirement);	
+	}
+	
+	/**
+	 * Returns an Array of Dependency objects from a Pharkdep
+	 */
+	public static function load($file, $shell=null)
+	{
+		$shell = $shell ?: new Shell();
+	
+		if($shell->isdir($file))
+			$file = (string) new Path($file, Dependency::FILENAME);
+	
+		if(!$shell->isfile($file))
+			throw new Exception("Failed to find $file");
+	
+		$deps = new DependencyBuilder($shell);
+		require $file;
+	
+		$result = $deps->build();
+	
+		return $result;
 	}
 }
