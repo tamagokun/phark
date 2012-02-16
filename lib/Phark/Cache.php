@@ -22,6 +22,13 @@ class Cache
 		{
 			return $filename->dir;
 		}
+		
+		// is it a link to a git repository?
+		if($filename->type == "git")
+		{
+			exec("git clone {$url} {$filename->dir}");
+			return $filename->dir;
+		}
 
 		// how about the archive?
 		if(!$shell->isfile($filename->archive))
