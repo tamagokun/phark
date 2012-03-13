@@ -21,11 +21,27 @@ class DependenciesCommand implements \Phark\Command
 	{
 		if(!($project = $env->project()))
 			throw new Exception("This command only works inside a project");
-
+		
+		//download any dependencies from source
+		foreach($project->dependencies() as $dependency)
+		{
+			if(!empty($dependency->source))
+			{
+				$env->shell()->printf(" * fetching source for %s\n", $dependency);
+				try {
+					$dependency->fetch_source($project->vendorDir());
+				}
+				catch(Exception $e)
+				{
+					$env->shell()->printf("Failed to fetch source\n");
+				}
+			}
+		}
+		
 		$installed = new SourceIndex(array($project->packages()));
 
 		// create a source index
-		$index = new SourceIndex($env->sources());
+		$index = new SourceIndex(array_merge($env->sources()));
 		$resolver = new DependencyResolver($index, $project->dependencies());
 		
 		$env->shell()->printf(" * checking dependencies for %s\n", $project->name());

@@ -9,7 +9,7 @@ class Dependency
 {
 	const FILENAME='Pharkdeps';
 	
-	public $package, $requirement, $group, $location;
+	public $package, $requirement, $group, $source=array();
 
 	public function __construct($package)
 	{
@@ -29,11 +29,28 @@ class Dependency
 				foreach($option as $key=>$value)
 				{
 					if($key == "group") $this->group = $value;
-					
-				}	
+					else $this->source = array_merge($this->source,$value);
+				}
 			}
 		}
-		
+	}
+	
+	public function fetch_source($destination)
+	{
+		foreach($this->source as $method=>$location)
+		{
+			$source_dir = "{$destination}/{$this->package}";
+			if(is_dir($source_dir)) continue;
+			$output = null;
+			$status = null;
+			switch($method)
+			{
+				case "git":
+					exec("git clone {$location} {$destination}/{$this->package}",$output,$status);
+					if($status > 0) throw new Exception("Unable to clone git repository");
+					break;
+			}
+		}
 	}
 
 	public function isSatisfiedBy($package, $version)
