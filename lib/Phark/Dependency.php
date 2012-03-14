@@ -15,7 +15,8 @@ class Dependency
 	{
 		$args = func_get_args();
 		$this->package = array_shift($args);
-		$this->configure($args);
+		if(is_array($options = array_shift($args)))
+			$this->configure($options);
 	}
 	
 	public function configure($options)
@@ -29,7 +30,7 @@ class Dependency
 				foreach($option as $key=>$value)
 				{
 					if($key == "group") $this->group = $value;
-					else $this->source = array_merge($this->source,$value);
+					else $this->source = array_merge($this->source,$option);
 				}
 			}
 		}
@@ -48,6 +49,10 @@ class Dependency
 				case "git":
 					exec("git clone {$location} {$destination}/{$this->package}",$output,$status);
 					if($status > 0) throw new Exception("Unable to clone git repository");
+					break;
+				case "svn":
+					exec("svn checkout {$location} {$destination}/{$this->package}",$output,$status);
+					if($status > 0) throw new Exception("Unable to checkout svn repository");
 					break;
 			}
 		}

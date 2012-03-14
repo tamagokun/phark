@@ -37,8 +37,6 @@ class DependenciesCommand implements \Phark\Command
 			}
 		}
 		
-		//print_r($project->packages()->packages());
-
 		$installed = new SourceIndex(array($project->packages()));
 
 		// create a source index

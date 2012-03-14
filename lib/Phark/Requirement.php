@@ -18,7 +18,7 @@ class Requirement
 			$this->_requirements []= $this->_parse($r);
 	}
 
-  private function _parse($requirement)
+  	private function _parse($requirement)
 	{
 		if(!preg_match('/^(~>|<=?|>=?|=|)(\d+\.\d+.\w+)$/',$requirement,$m))
 			throw new Exception("Invalid requirement $requirement");

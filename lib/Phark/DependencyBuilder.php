@@ -19,7 +19,7 @@ class DependencyBuilder
 
 	public function dependency($name)
 	{
-		$this->_dependencies []= func_get_args(); 
+		$this->_dependencies []= func_get_args();
 		return $this;
 	}
 
