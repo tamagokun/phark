@@ -31,7 +31,7 @@ class DependencyBuilder
 		{
 			$name = array_shift($d);
 			$deps []= new Dependency($name, $d, $this->_sources);
-		}		
+		}
 
 		return $deps;
 	}

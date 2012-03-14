@@ -44,7 +44,8 @@ class Project
 		if($this->_env->shell()->isfile($pharkspec))
 		{
 			$found = true;
-			if($deps = Specification::load($pharkspec)->dependencies() && count($deps) > 0)
+			$deps = Specification::load($pharkspec)->dependencies();
+			if($deps && count($deps) > 0)
 				return $deps;
 		}
 		if($this->_env->shell()->isfile($pharkdeps))

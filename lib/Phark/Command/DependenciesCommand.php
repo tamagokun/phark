@@ -21,7 +21,6 @@ class DependenciesCommand implements \Phark\Command
 	{
 		if(!($project = $env->project()))
 			throw new Exception("This command only works inside a project");
-		
 		//download any dependencies from source
 		foreach($project->dependencies() as $dependency)
 		{
@@ -38,10 +37,12 @@ class DependenciesCommand implements \Phark\Command
 			}
 		}
 		
+		//print_r($project->packages()->packages());
+
 		$installed = new SourceIndex(array($project->packages()));
 
 		// create a source index
-		$index = new SourceIndex(array_merge($env->sources()));
+		$index = new SourceIndex(array_merge($env->sources(),array($project->packages())));
 		$resolver = new DependencyResolver($index, $project->dependencies());
 		
 		$env->shell()->printf(" * checking dependencies for %s\n", $project->name());
